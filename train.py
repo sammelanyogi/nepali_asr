@@ -1,7 +1,7 @@
 from model import HancyModel
 from dataloader import NlpDataset, data_processing
 import torch.optim as optim
-from torch.utils.data import Dataloader
+from torch.utils.data import DataLoader
 from torch.nn import functional as F
 import torch.nn as nn
 from argparse import ArgumentParser
@@ -11,7 +11,7 @@ from torch.utils.data import random_split
 import torch
 import pickle
 
-from .utils import TextProcess, processLabels
+from utils import TextProcess, processLabels
 import pytorch_lightning as pl
 
 
@@ -136,8 +136,8 @@ if __name__ == "__main__":
 
     dataset = NlpDataset(x, y)
     train, val = random_split(dataset, len(dataset) * 0.8, len(dataset) * 0.2)
-    train_loader = Dataloader(
+    train_loader = DataLoader(
         dataset=train, collate_fn=data_processing(dataset, tprocess)
     )
-    val_loader = Dataloader(dataset=val, collate_fn=data_processing(dataset, tprocess))
+    val_loader = DataLoader(dataset=val, collate_fn=data_processing(dataset, tprocess))
     main(args, train_loader, val_loader)

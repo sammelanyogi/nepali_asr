@@ -35,17 +35,16 @@ class SpeechRecog(pl.LightningModule):
 
     def configure_optimizers(self):
         self.optimizer = optim.AdamW(self.model.parameters(), 0.01)
-        self.scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+        lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(
             self.optimizer, mode="min", factor=0.50, patience=6
         )
-        return (
-            {
-                "optimizer": self.optimizer,
-                "lr_scheduler": self.scheduler,
-                "monitor": "val_loss",
-            },
-        )
-        # return [self.optimizer], [self.scheduler]
+        self.scheduler = {
+            'scheduler': lr_scheduler, 
+            'reduce_on_plateau': True,
+            # val_checkpoint_on is val_loss passed in as checkpoint_on
+            'monitor': 'val_checkpoint_on'
+        }
+        return [self.optimizer], [self.scheduler]
 
     def forward(self, x, hidden):
         return self.model(x, hidden)

@@ -27,17 +27,25 @@ def checkpoint_callback(args):
 
 
 class SpeechRecog(pl.LightningModule):
-    def __init__(self, model):
+    def __init__(self, model, args):
         super().__init__()
         self.model = model
         self.criterion = nn.CTCLoss(blank=28, zero_infinity=True)
+        self.args = args
 
     def configure_optimizers(self):
-        self.optimizer = optim.AdamW(self.model.parameters(), self.args.learning_rate)
+        self.optimizer = optim.AdamW(self.model.parameters(), 0.01)
         self.scheduler = optim.lr_scheduler.ReduceLROnPlateau(
             self.optimizer, mode="min", factor=0.50, patience=6
         )
-        return [self.optimizer], [self.scheduler]
+        return (
+            {
+                "optimizer": self.optimizer,
+                "lr_scheduler": self.scheduler,
+                "monitor": "val_loss",
+            },
+        )
+        # return [self.optimizer], [self.scheduler]
 
     def forward(self, x, hidden):
         return self.model(x, hidden)
@@ -64,16 +72,16 @@ class SpeechRecog(pl.LightningModule):
 
 def main(args, train_loader, val_loader):
     model = HancyModel()
-    speechmodule = SpeechRecog(model)
+    speechmodule = SpeechRecog(model, args)
     trainer = pl.Trainer(
         max_epochs=2,
-        gpus=2,
-        num_nodes=8,
+        gpus=1,
+        num_nodes=1,
         distributed_backend=None,
         gradient_clip_val=1.0,
         val_check_interval=0.25,
         checkpoint_callback=checkpoint_callback(args),
-        resume_from_checkpoint=args.resume_from_checkpoint,
+        # resume_from_checkpoint=args.resume_from_checkpoint,
     )
     trainer.fit(speechmodule, train_loader, val_loader)
 
@@ -130,12 +138,16 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     tprocess = TextProcess()
-
-    x = torch.load("/dest")
-    y = processLabels(pickle.load("/dest"))
-
+    print("Loading x label")
+    x = torch.load(args.load_x)
+    print("Loaded all tensor")
+    print("Loading y label")
+    y = processLabels(pickle.load(open(args.load_y, "rb")))
+    print("Loaded all label")
     dataset = NlpDataset(x, y)
-    train, val = random_split(dataset, len(dataset) * 0.8, len(dataset) * 0.2)
+    tt = int(len(dataset) * 0.8)
+    tl = len(dataset) - tt
+    train, val = random_split(dataset, [tt, tl])
     train_loader = DataLoader(
         dataset=train, collate_fn=data_processing(dataset, tprocess)
     )

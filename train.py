@@ -1,4 +1,4 @@
-from model import HancyModel
+from model import HancyModel, SpeechRecognition
 from dataloader import NlpDataset, data_processing
 import torch.optim as optim
 from torch.utils.data import DataLoader
@@ -70,7 +70,7 @@ class SpeechRecog(pl.LightningModule):
 
 
 def main(args, train_loader, val_loader):
-    model = HancyModel()
+    model = SpeechRecognition()
     speechmodule = SpeechRecog(model, args)
     trainer = pl.Trainer(
         max_epochs=2,

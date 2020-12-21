@@ -3,6 +3,7 @@ import torch.nn as nn
 import torchaudio
 import numpy as np
 from torch.utils.data import Dataset
+from utils import TextProcess
 
 
 train_audio_transforms = nn.Sequential(
@@ -13,11 +14,12 @@ train_audio_transforms = nn.Sequential(
 
 valid_audio_transforms = torchaudio.transforms.MelSpectrogram()
 
-def data_processing(data, tprocess, data_type="train"):
+def data_processing(data, data_type="train"):
     spectrograms = []
     labels = []
     input_lengths = []
     label_lengths = []
+    tprocess = TextProcess()
     for (waveform, utterance) in data:
         if data_type == 'train':
             spec = train_audio_transforms(waveform).squeeze(0).transpose(0, 1)

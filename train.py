@@ -11,7 +11,7 @@ from torch.utils.data import random_split
 import torch
 import pickle
 
-from utils import TextProcess, processLabels
+from utils import processLabels
 import pytorch_lightning as pl
 
 
@@ -39,10 +39,10 @@ class SpeechRecog(pl.LightningModule):
             self.optimizer, mode="min", factor=0.50, patience=6
         )
         self.scheduler = {
-            'scheduler': lr_scheduler, 
-            'reduce_on_plateau': True,
+            "scheduler": lr_scheduler,
+            "reduce_on_plateau": True,
             # val_checkpoint_on is val_loss passed in as checkpoint_on
-            'monitor': 'val_checkpoint_on'
+            "monitor": "val_checkpoint_on",
         }
         return [self.optimizer], [self.scheduler]
 
@@ -136,7 +136,6 @@ if __name__ == "__main__":
         help="path to save logs",
     )
     args = parser.parse_args()
-    tprocess = TextProcess()
     print("Loading x label")
     x = torch.load(args.load_x)
     print("Loaded all tensor")
@@ -147,8 +146,6 @@ if __name__ == "__main__":
     tt = int(len(dataset) * 0.8)
     tl = len(dataset) - tt
     train, val = random_split(dataset, [tt, tl])
-    train_loader = DataLoader(
-        dataset=train, collate_fn=data_processing(dataset, tprocess)
-    )
-    val_loader = DataLoader(dataset=val, collate_fn=data_processing(dataset, tprocess))
+    train_loader = DataLoader(dataset=train, collate_fn=data_processing)
+    val_loader = DataLoader(dataset=val, collate_fn=data_processing)
     main(args, train_loader, val_loader)

@@ -7,7 +7,7 @@ from utils import TextProcess
 
 
 train_audio_transforms = nn.Sequential(
-    torchaudio.transforms.MelSpectrogram(sample_rate=8000, n_mels=128),
+    torchaudio.transforms.MelSpectrogram(sample_rate=8000, n_mels=81),
 #     torchaudio.transforms.FrequencyMasking(freq_mask_param=15),
 #     torchaudio.transforms.TimeMasking(time_mask_param=35)
 )

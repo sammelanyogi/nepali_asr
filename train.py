@@ -34,7 +34,7 @@ class SpeechRecog(pl.LightningModule):
         self.args = args
 
     def configure_optimizers(self):
-        self.optimizer = optim.AdamW(self.model.parameters(), 0.01)
+        self.optimizer = optim.AdamW(self.model.parameters(), 0.001)
         lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(
             self.optimizer, mode="min", factor=0.50, patience=6
         )

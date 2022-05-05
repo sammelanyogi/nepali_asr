@@ -3,7 +3,7 @@
 Nepali Automatic Speech Recognition using pytorch
 
   
-  
+# Project_major.ipynb is the file that should work. 
 
 **usage**:
 
